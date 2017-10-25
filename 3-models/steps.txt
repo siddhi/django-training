@@ -1,0 +1,63 @@
+1. Run the migrate command to create the database tables
+
+wiki> python manage.py migrate
+
+2. Edit wiki/pages/models.py and add a Page model
+
+class Page(models.Model):
+    title = models.CharField(max_length=128)
+    content = models.TextField()
+    last_updated = models.DateTimeField()
+
+3. Edit wiki/wiki/settings.py and the pages app to the project configuration
+
+INSTALLED_APPS = [
+    ...
+    'pages.apps.PagesConfig'
+]
+
+4. Create a database migration for the pages app
+
+wiki> python manage.py makemigrations pages
+
+5. Apply the new migration to the database
+
+wiki> python manage.py migrate
+
+6. Use the models API from the django shell
+
+wiki> python manage.py shell
+
+>>> from pages.models import Page
+>>> from django.utils import timezone
+>>> page1 = Page(title="HomePage", content="This is the home page", last_updated=timezone.now())
+>>> page1.save()
+>>> Page.objects.all()
+<QuerySet [<Page: Page object>]>
+>>> page2 = Page(title="ProjectPage", content="This is the project page", last_updated=timezone.now())
+>>> page2.save()
+>>> Page.objects.all()
+<QuerySet [<Page: Page object>, <Page: Page object>]>
+>>> Page.objects.all()[0].title
+'HomePage'
+>>> Page.objects.all()[1].title
+'ProjectPage'
+>>> Page.objects.get(title="ProjectPage").content
+'This is the project page'
+>>> Page.objects.filter(title__contains="Page")
+<QuerySet [<Page: Page object>, <Page: Page object>]>
+>>>
+
+7. Edit wiki/pages/models.py and add a __str__ method to the Page model
+
+    def __str__(self):
+        return f"{self.id}: {self.title}"
+
+8. Open the django shell again
+
+wiki> python manage.py shell
+
+>>> from pages.models import Page
+>>> Page.objects.all()
+>>> Page.objects.all()
+<QuerySet [<Page: 1: HomePage>, <Page: 2: ProjectPage>]>

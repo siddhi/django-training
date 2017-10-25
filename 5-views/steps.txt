@@ -1,0 +1,41 @@
+1. Create a template in wiki/pages/templates/pages/view_page.html
+
+<html>
+    <head><title>{{ page.title }}</title></html>
+    <body>
+        <h1>{{ page.title }}</h1>
+        <p> Last Updated: {{ page.last_updated }}</p>
+        <hr/>
+        {{ page.content }}
+    </body>
+</html>
+
+2. Edit wiki/pages/views.py and create a view that displays the given wiki page
+
+from .models import Page
+
+def show_page(request, title):
+    page = Page.objects.get(title=title)
+    return render(request, "pages/view_page.html", {"page": page})
+
+3. Edit wiki/pages/urls.py and add a url mapping to this page
+
+urlpatterns = [
+    url(r'^$', views.index, name='index'),
+    url(r'^(?P<title>[A-Za-z]+)/$', views.show_page, name='show-page')
+]
+
+4. Start the server and open http://localhost:8000/pages/HomePage/
+
+5. Edit wiki/pages/views.py and add a check to handle invalid titles
+
+from django.http import HttpResponse, Http404
+
+def show_page(request, title):
+    try:
+        page = Page.objects.get(title=title)
+    except Page.DoesNotExist:
+        raise Http404("The requested page does not exist")
+    return render(request, "pages/view_page.html", {"page": page})
+
+6. Start the server and open http://localhost:8000/pages/UnknownPage/

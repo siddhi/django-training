@@ -1,0 +1,22 @@
+1. Create a superuser
+
+wiki> python manage.py createsuperuser
+
+2. Start the server and open http://localhost:8000/admin/
+
+3. Edit wiki/pages/admin.py
+
+from .models import Page
+
+admin.site.register(Page)
+
+3. Reload the admin page
+
+4. Edit wiki/pages/admin.py and add some customisations to the admin display
+
+@admin.register(Page)
+class PageAdmin(admin.ModelAdmin):
+    list_display = ('title', 'last_updated')
+    date_hierarchy = 'last_updated'
+
+5. Reload the admin page

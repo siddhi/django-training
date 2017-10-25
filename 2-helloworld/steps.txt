@@ -1,0 +1,30 @@
+1. Create the pages app
+
+wiki> python manage.py startapp pages
+
+2. Edit wiki/pages/views.py
+
+from django.http import HttpResponse
+
+def index(request):
+    return HttpResponse("Hello World")
+
+3. Edit wiki/wiki/urls.py and create a url mapping to the pages app
+
+from django.conf.urls import url, include
+
+urlpatterns = [
+    url(r'^pages/', include('pages.urls')),
+    ...
+]
+
+4. Create the file wiki/pages/urls.py and create a url mapping to the index view
+
+from django.conf.urls import url
+from . import views
+
+urlpatterns = [
+    url(r'^$', views.index, name='index')
+]
+
+5. Start the server and open http://localhost:8000/pages/ You should see Hello World rendered

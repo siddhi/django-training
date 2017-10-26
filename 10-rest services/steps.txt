@@ -1,0 +1,46 @@
+1. Install Django REST framework
+
+> pip install djangorestframework
+
+2. Create a serialiser for the page model in wiki/pages/serializers.py
+
+from rest_framework import serializers
+from .models import Page
+
+class PageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Page
+        fields = ('id', 'title', 'content', 'last_updated')
+
+3. Create a viewset in wiki/pages/views.py
+
+class PageViewSet(viewsets.ModelViewSet):
+    queryset = Page.objects.all().order_by("-last_updated")
+    serializer_class = PageSerializer
+
+4. Configure the URLs in wiki/pages/urls.py
+
+from rest_framework import routers
+
+router = routers.DefaultRouter()
+router.register('pages', views.PageViewSet)
+
+urlpatterns = [
+    url(r'^api/', include(router.urls)),
+    ...
+]
+
+5. Configure the settings.py
+
+INSTALLED_APPS = [
+    ...
+    'rest_framework'
+]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+    ],
+    'PAGE_SIZE': 10
+}
+
+6. Start the server and go to http://localhost:8000/pages/api/pages/

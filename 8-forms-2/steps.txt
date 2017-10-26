@@ -1,0 +1,43 @@
+1. Create a file wiki/pages/forms.py with the following
+
+from django import forms
+
+class PageForm(forms.Form):
+    content = forms.CharField(label="Content", widget=forms.Textarea)
+
+2. Change the view to use this form
+
+from .forms import PageForm
+
+class EditPage(View):
+    def get(self, request, slug):
+        page = Page.objects.get(title=slug)
+        form = PageForm(initial={'content': page.content})
+        return render(request, "pages/edit_page.html", {"page": page, "form": form})
+
+    def post(self, request, slug):
+        form = PageForm(request.POST)
+        page = Page.objects.get(title=slug)
+        if form.is_valid():
+            page.content = request.POST['content']
+            page.save()
+            return HttpResponseRedirect(reverse('show-page', args=(slug,)))
+        return render(request, "pages/edit_page.html", {"page": page, "form": form})
+
+4. Use the form object in the template
+
+<html>
+    <head><title>Edit {{ page.title }}</title></html>
+    <body>
+        <h1>Editing {{ page.title }}</h1>
+        <hr/>
+        <form method="post" action="{% url 'edit-page' page.title %}" novalidate>
+            {% csrf_token %}
+            {{ form }}
+            <br/>
+            <button type="submit">Save</button>
+        </form>
+    </body>
+</html>
+
+3. Go to http://127.0.0.1:8000/pages/HomePage/edit/ and try to save empty content

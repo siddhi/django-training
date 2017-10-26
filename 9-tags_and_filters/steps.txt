@@ -1,0 +1,78 @@
+1. Create a file wiki/pages/templates/layout.html
+
+<html>
+    <head><title>{% block title %}Wiki page{% endblock %}</title></html>
+    <body>
+        {% block content %}
+        {% endblock %}
+    </body>
+</html>
+
+2. Now change view_page.html to extend this layout file
+
+{% extends 'layout.html' %}
+
+{% block title %}{{ page.title }}{% endblock %}
+
+{% block content %}
+        <h1>{{ page.title }}</h1>
+        <p> Last Updated: {{ page.last_updated }}</p>
+        <hr/>
+        {{ page.content }}
+{% endblock %}
+
+3. Open the page http://localhost:8000/pages/HomePage/ and confirm that it works same as before
+
+4. Repeat for the edit page template as well
+
+5. Change the Last updated part of view page template like this
+
+        <p> Last Updated: {{ page.last_updated | date:'d-M-y' }}</p>
+
+6. Open the page http://localhost:8000/pages/HomePage/ How is last updated date shown compared to before?
+
+7. Install the markdown library
+
+> pip install markdown
+
+8. Create an *empty* file wiki/pages/templatetags/__init__.py
+
+9. Create another file wiki/pages/templatetags/page_helpers.py
+
+from django import template
+import markdown
+
+register = template.Library()
+
+def wikiformat(value):
+    return markdown.markdown(value)
+
+register.filter('wikiformat', wikiformat)
+
+10. Update the view page template like this
+
+{% extends 'layout.html' %}
+{% load page_helpers %}
+
+{% block title %}{{ page.title }}{% endblock %}
+
+{% block content %}
+        <h1>{{ page.title }}</h1>
+        <p> Last Updated: {{ page.last_updated | date:'d-M-y' }}</p>
+        <hr/>
+        {{ page.content | wikiformat }}
+{% endblock %}
+
+11. Go to http://localhost:8000/pages/HomePage/
+
+12. Change the template like like this
+
+        {{ page.content | wikiformat | safe }}
+
+13. What does the page show now?
+
+14. Edit the page http://localhost:8000/pages/HomePage/edit with the following content and save
+
+This is the **home page**
+
+15. What do you see?

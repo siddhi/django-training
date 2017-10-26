@@ -16,11 +16,15 @@ src> pip install -r requirements.txt
 >>> django.__version__
 '1.11.6'
 
-4. Start the dev server
+4. Create a django project
+
+> django-admin startproject wiki
+
+5. Start the dev server
 
 > cd wiki
 wiki> python manage.py runserver
 
-5. Open the browser to localhost:8000
+6. Open the browser to localhost:8000
 
 You should see a welcome page

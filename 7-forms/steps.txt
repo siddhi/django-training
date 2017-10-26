@@ -1,0 +1,47 @@
+1. Create a template in wiki/pages/templates/pages/edit_page.html
+
+<html>
+    <head><title>Edit {{ page.title }}</title></html>
+    <body>
+        <h1>Editing {{ page.title }}</h1>
+        <hr/>
+        <form method="post" action="{% url 'edit-page' page.title %}">
+            {% csrf_token %}
+            <textarea name="content" rows="10" cols="50">{{ page.content }}</textarea>
+            <br/>
+            <button type="submit">Save</button>
+        </form>
+    </body>
+</html>
+
+2. Write a view to render the template
+
+class EditPage(View):
+    def get(self, request, slug):
+        page = Page.objects.get(title=slug)
+        return render(request, "pages/edit_page.html", {"page": page})
+
+3. Map a url to the view
+
+    url(r'^(?P<slug>[A-Za-z]+)/edit/$', views.EditPage.as_view(), name='edit-page')
+
+4. Start the server and open http://localhost:8000/pages/TeamPage/edit/
+
+5. Now let us handle the post request when the user submits the form
+
+from django.urls import reverse
+
+class EditPage(View):
+    def get(self, request, slug):
+        page = Page.objects.get(title=slug)
+        return render(request, "pages/edit_page.html", {"page": page})
+
+    def post(self, request, slug):
+        page = Page.objects.get(title=slug)
+        page.content = request.POST['content']
+        page.save()
+        return HttpResponseRedirect(reverse('show-page', args=(slug,)))
+
+6. Return to http://localhost:8000/pages/TeamPage/edit/ and change the content and save
+
+7. Verify the content was saved via the admin app

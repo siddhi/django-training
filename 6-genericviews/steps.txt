@@ -1,0 +1,49 @@
+1. Edit wiki/pages/views.py to create a new view for the index page
+
+def index(request):
+    pages = Page.objects.all().order_by("-last_updated")
+    return render(request, "pages/index.html", {"pages": pages})
+
+2. Create the template in wiki/pages/templates/pages/index.html
+
+<html>
+    <head><title>Wiki Home page</title></html>
+    <body>
+        <h1>Available Pages</h1>
+        <hr/>
+        <ul>
+        {% for page in pages %}
+        <li><a href="{% url 'show-page' page.title %}">{{ page.title }}</a></l1>
+        {% endfor %}
+        </ul>
+    </body>
+</html>
+
+3. Start the server and open http://localhost:8000/pages/
+
+4. Edit wiki/pages/views.py and replace the index view with a generic view
+
+from django.views import generic
+
+class IndexView(generic.ListView):
+    template_name = "pages/index.html"
+    context_object_name = "pages"
+
+    def get_queryset(self):
+        return Page.objects.all().order_by("-last_updated")
+
+5. Edit wiki/pages/urls.py to map the url to this generic view
+
+    url(r'^$', views.IndexView.as_view(), name='index'),
+
+6. Do the same for show page
+
+class ShowPage(generic.DetailView):
+    model = Page
+    template_name = "pages/view_page.html"
+    context_object_name = "page"
+    slug_field = "title"
+
+7. and in urls
+
+    url(r'^(?P<slug>[A-Za-z]+)/$', views.ShowPage.as_view(), name='show-page')
